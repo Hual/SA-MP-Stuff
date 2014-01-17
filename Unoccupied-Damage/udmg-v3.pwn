@@ -4,7 +4,6 @@
 /******************** By King_Hual ********************/
 /******************************************************/
 
-#define MINIGUN_DAMAGE_ENABLED true
 #define VEHICLE_STATE_INACTIVE 0
 #define VEHICLE_STATE_SPAWNED 1
 #define VEHICLE_STATE_DYING 2
