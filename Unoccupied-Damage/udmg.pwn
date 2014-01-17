@@ -3,11 +3,14 @@
 /******************** By King_Hual ********************/
 /******************************************************/
 
-#define MINIGUN_DAMAGE_ENABLED false
+#define MINIGUN_DAMAGE_ENABLED true
 
 #include <a_samp>
 
-new	Float:wdamage[13] = {
+new
+	bool:dying[MAX_VEHICLES] = {false,...},
+	timers[MAX_VEHICLES] = {-1,...},
+	Float:wdamage[13] = {
 		25.0,
 		40.0,
 		140.0,
@@ -23,6 +26,16 @@ new	Float:wdamage[13] = {
 		125.0
 };
 
+forward OnUnoccupiedVehicleDestroy(vehicleid, modelid, Float:x, Float:y, Float:z, Float:a);
+
+public OnUnoccupiedVehicleDestroy(vehicleid, modelid, Float:x, Float:y, Float:z, Float:a)
+{
+	timers[vehicleid] = -1;
+	DestroyVehicle(vehicleid);
+	CreateVehicle(modelid, x, y, z, a, -1, -1, -1);
+	dying[vehicleid] = false;
+}
+
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
 	if(hittype == BULLET_HIT_TYPE_VEHICLE && !isVehicleOccupied(hitid))
@@ -34,18 +47,36 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			case 22..34:
 			{
 				if(vhp-wdamage[weaponid-22] >= 0)
-					SetVehicleHealth(hitid, vhp-wdamage[weaponid-22]);
+					SetVehicleHealth(hitid, (vhp = vhp-wdamage[weaponid-22]));
 			}
 			#if MINIGUN_DAMAGE_ENABLED == true
 			case 38:
 			{
 				if(vhp-140.0 >= 0)
-					SetVehicleHealth(hitid, vhp-140.0);
+					SetVehicleHealth(hitid, (vhp = vhp-140.0));
 			}
 			#endif
 		}
+		if(!dying[hitid] && vhp <= 250.0)
+		{
+		    dying[hitid] = true;
+		    new Float:pos[4];
+		    GetVehiclePos(hitid, pos[0], pos[1], pos[2]);
+		    GetVehicleZAngle(hitid, pos[3]);
+		    timers[hitid] = SetTimerEx("OnUnoccupiedVehicleDestroy", 7000, false, "iiffff", hitid, GetVehicleModel(hitid), pos[0], pos[1],  pos[2], pos[3]);
+		}
 	}
 	return 1;
+}
+
+public OnVehicleSpawn(vehicleid)
+{
+	if(timers[vehicleid] != -1)
+	{
+	    KillTimer(timers[vehicleid]);
+	    timers[vehicleid] = -1;
+	    dying[vehicleid] = false;
+	}
 }
 
 stock isVehicleOccupied(vehicleid)
