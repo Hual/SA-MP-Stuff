@@ -26,9 +26,9 @@ new
 		125.0
 };
 
-forward OnUnoccupiedVehicleDestroy(vehicleid, modelid, Float:x, Float:y, Float:z, Float:a);
+forward OUVD(vehicleid, modelid, Float:x, Float:y, Float:z, Float:a);
 
-public OnUnoccupiedVehicleDestroy(vehicleid, modelid, Float:x, Float:y, Float:z, Float:a)
+public OUVD(vehicleid, modelid, Float:x, Float:y, Float:z, Float:a)
 {
 	timers[vehicleid] = -1;
 	DestroyVehicle(vehicleid);
@@ -63,7 +63,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 		    new Float:pos[4];
 		    GetVehiclePos(hitid, pos[0], pos[1], pos[2]);
 		    GetVehicleZAngle(hitid, pos[3]);
-		    timers[hitid] = SetTimerEx("OnUnoccupiedVehicleDestroy", 7000, false, "iiffff", hitid, GetVehicleModel(hitid), pos[0], pos[1],  pos[2], pos[3]);
+		    timers[hitid] = SetTimerEx("OUVD", 7000, false, "iiffff", hitid, GetVehicleModel(hitid), pos[0], pos[1],  pos[2], pos[3]);
 		}
 	}
 	return 1;
