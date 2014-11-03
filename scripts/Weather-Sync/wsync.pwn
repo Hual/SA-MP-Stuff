@@ -203,6 +203,6 @@ public Weather_Timer()
 public OnFilterScriptInit()
 {
 
-	SetTimerEx("Weather_Timer", REFRESH_RATE, 1, "");
+	SetTimer("Weather_Timer", REFRESH_RATE, 1);
 	return 1;
 }
